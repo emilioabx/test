@@ -89,7 +89,7 @@
 
         input[type="number"] {
             width: 60px;
-            padding: 0.4rem 0.3rem;
+            padding: 0.5rem 0.4rem;
             background: #3a3a3a;
             border: 1px solid #4a4a4a;
             border-radius: 4px;
@@ -97,10 +97,27 @@
             font-size: 0.875rem;
             outline: none;
             text-align: center;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         input[type="number"]:focus {
             border-color: #666;
+            background: #404040;
+        }
+
+        input[type="number"]:hover {
+            border-color: #5a5a5a;
+        }
+
+        /* Remove spinner arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 0.3;
+        }
+
+        input[type="number"]:hover::-webkit-inner-spin-button,
+        input[type="number"]:hover::-webkit-outer-spin-button {
+            opacity: 1;
         }
 
         .angle-input {
@@ -174,17 +191,18 @@
         .color-picker-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .color-spectrum-canvas {
             width: 100%;
-            height: 160px;
-            border-radius: 6px;
+            height: 240px;
+            border-radius: 8px;
             border: 1px solid #3a3a3a;
             cursor: crosshair;
             touch-action: none;
             display: block;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .hue-slider-wrapper {
@@ -193,10 +211,20 @@
         }
 
         .color-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 0.75rem;
             margin-top: 1rem;
+        }
+
+        .hsl-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .hsl-row .color-value-item {
+            flex: 1;
         }
 
         .color-value-item {
@@ -207,23 +235,31 @@
 
         .color-value-label {
             font-size: 0.7rem;
-            color: #808080;
+            color: #9a9a9a;
             text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
         }
 
         .color-value-input {
             font-family: 'Courier New', monospace;
-            font-size: 0.813rem;
+            font-size: 0.875rem;
             color: #fff;
-            background: #2a2a2a;
+            background: #3a3a3a;
             padding: 0.5rem 0.6rem;
             border-radius: 4px;
-            border: 1px solid #3a3a3a;
+            border: 1px solid #4a4a4a;
             outline: none;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         .color-value-input:focus {
             border-color: #666;
+            background: #404040;
+        }
+
+        .color-value-input:hover {
+            border-color: #5a5a5a;
         }
 
         .tabs {
@@ -275,17 +311,18 @@
 
         .css-output {
             background: #2a2a2a;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border: 1px solid #3a3a3a;
         }
 
         .css-code {
             font-family: 'Courier New', monospace;
-            font-size: 0.813rem;
+            font-size: 0.875rem;
             color: #a0d0ff;
             word-break: break-all;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .copy-btn {
@@ -326,30 +363,25 @@
         <!-- Color Picker Mode -->
         <div class="tab-content active" id="picker-content">
             <div class="color-picker-wrapper">
-                <canvas id="colorCanvas" class="color-spectrum-canvas" width="600" height="200"></canvas>
-                <div class="hue-slider-wrapper">
-                    <div class="slider-item">
-                        <span class="slider-label">Hue</span>
-                        <input type="range" id="pickerH" min="0" max="360" value="0">
-                        <span class="slider-value" id="pickerH-val">0</span>
-                    </div>
-                </div>
+                <canvas id="colorCanvas" class="color-spectrum-canvas" width="600" height="240"></canvas>
                 <div class="color-values">
+                    <div class="hsl-row">
+                        <div class="color-value-item">
+                            <span class="color-value-label">H (0-360°)</span>
+                            <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
+                        </div>
+                        <div class="color-value-item">
+                            <span class="color-value-label">S (0-100%)</span>
+                            <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
+                        </div>
+                        <div class="color-value-item">
+                            <span class="color-value-label">L (0-100%)</span>
+                            <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
+                        </div>
+                    </div>
                     <div class="color-value-item">
                         <span class="color-value-label">HEX</span>
                         <input type="text" class="color-value-input" id="hexValue" value="#ff0000">
-                    </div>
-                    <div class="color-value-item">
-                        <span class="color-value-label">H</span>
-                        <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
-                    </div>
-                    <div class="color-value-item">
-                        <span class="color-value-label">S</span>
-                        <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
-                    </div>
-                    <div class="color-value-item">
-                        <span class="color-value-label">L</span>
-                        <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
                     </div>
                 </div>
             </div>
@@ -496,14 +528,13 @@
         // Color Picker mode inputs
         const colorCanvas = document.getElementById('colorCanvas');
         const ctx = colorCanvas.getContext('2d');
-        const pickerH = document.getElementById('pickerH');
-        const pickerHVal = document.getElementById('pickerH-val');
         const hexValue = document.getElementById('hexValue');
         const pickerHInput = document.getElementById('pickerHInput');
         const pickerSInput = document.getElementById('pickerSInput');
         const pickerLInput = document.getElementById('pickerLInput');
 
         // Current picker values
+        let pickerHue = 0;
         let pickerSaturation = 100;
         let pickerLightness = 50;
 
@@ -575,7 +606,7 @@
         function drawColorSpectrum() {
             const width = colorCanvas.width;
             const height = colorCanvas.height;
-            const h = parseInt(pickerH.value);
+            const h = pickerHue;
 
             // Dimensions
             const hueBarHeight = Math.floor(height / 10);  // ~1/10 of total height
@@ -632,7 +663,7 @@
 
         // Update Color Picker display
         function updateColorPicker() {
-            const h = parseInt(pickerH.value);
+            const h = pickerHue;
             const s = pickerSaturation;
             const l = pickerLightness;
 
@@ -757,14 +788,11 @@
         deltaL.addEventListener('input', updateGradient);
         angleDelta.addEventListener('input', updateGradient);
 
-        // Event listeners for Color Picker mode
-        pickerH.addEventListener('input', updateGradient);
-
         // Event listeners for HSL number inputs
         pickerHInput.addEventListener('input', (e) => {
             const value = parseInt(e.target.value);
             if (!isNaN(value)) {
-                pickerH.value = clamp(value, 0, 360);
+                pickerHue = clamp(value, 0, 360);
                 updateGradient();
             }
         });
@@ -809,7 +837,7 @@
             if (canvasY >= spectrumHeight) {
                 // Click in hue bar - update hue
                 const newHue = Math.round((canvasX / width) * 360);
-                pickerH.value = clamp(newHue, 0, 360);
+                pickerHue = clamp(newHue, 0, 360);
                 updateGradient();
             }
             // Check if click is in spectrum zone (right 2/3)
@@ -868,7 +896,7 @@
             const hex = e.target.value;
             if (/^#[0-9A-F]{6}$/i.test(hex)) {
                 const hsl = hexToHSL(hex);
-                pickerH.value = hsl.h;
+                pickerHue = hsl.h;
                 pickerSaturation = hsl.s;
                 pickerLightness = hsl.l;
                 updateGradient();
