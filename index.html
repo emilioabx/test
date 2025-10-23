@@ -43,6 +43,10 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
+        .preview.hidden {
+            display: none;
+        }
+
         .controls {
             background: #2a2a2a;
             padding: 1rem;
@@ -336,8 +340,16 @@
                         <input type="text" class="color-value-input" id="hexValue" value="#ff0000">
                     </div>
                     <div class="color-value-item">
-                        <span class="color-value-label">HSL</span>
-                        <input type="text" class="color-value-input" id="hslValue" value="0, 100, 50">
+                        <span class="color-value-label">H</span>
+                        <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
+                    </div>
+                    <div class="color-value-item">
+                        <span class="color-value-label">S</span>
+                        <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
+                    </div>
+                    <div class="color-value-item">
+                        <span class="color-value-label">L</span>
+                        <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
                     </div>
                 </div>
             </div>
@@ -487,7 +499,9 @@
         const pickerH = document.getElementById('pickerH');
         const pickerHVal = document.getElementById('pickerH-val');
         const hexValue = document.getElementById('hexValue');
-        const hslValue = document.getElementById('hslValue');
+        const pickerHInput = document.getElementById('pickerHInput');
+        const pickerSInput = document.getElementById('pickerSInput');
+        const pickerLInput = document.getElementById('pickerLInput');
 
         // Current picker values
         let pickerSaturation = 100;
@@ -628,7 +642,9 @@
 
             preview.style.background = hslColor;
             hexValue.value = hexColor;
-            hslValue.value = `${h}, ${s}, ${l}`;
+            pickerHInput.value = h;
+            pickerSInput.value = s;
+            pickerLInput.value = l;
             cssCode.textContent = `background: ${hslColor};`;
 
             // Redraw spectrum with new hue
@@ -711,6 +727,13 @@
                 // Update current mode
                 currentMode = tabName;
 
+                // Show/hide preview based on mode
+                if (tabName === 'picker') {
+                    preview.classList.add('hidden');
+                } else {
+                    preview.classList.remove('hidden');
+                }
+
                 // Update gradient
                 updateGradient();
             });
@@ -736,6 +759,31 @@
 
         // Event listeners for Color Picker mode
         pickerH.addEventListener('input', updateGradient);
+
+        // Event listeners for HSL number inputs
+        pickerHInput.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value)) {
+                pickerH.value = clamp(value, 0, 360);
+                updateGradient();
+            }
+        });
+
+        pickerSInput.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value)) {
+                pickerSaturation = clamp(value, 0, 100);
+                updateGradient();
+            }
+        });
+
+        pickerLInput.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value)) {
+                pickerLightness = clamp(value, 0, 100);
+                updateGradient();
+            }
+        });
 
         // Canvas click/drag handling
         let isPickingColor = false;
@@ -827,17 +875,6 @@
             }
         });
 
-        // HSL input handling
-        hslValue.addEventListener('input', (e) => {
-            const values = e.target.value.split(',').map(v => parseInt(v.trim()));
-            if (values.length === 3 && values.every(v => !isNaN(v))) {
-                pickerH.value = clamp(values[0], 0, 360);
-                pickerSaturation = clamp(values[1], 0, 100);
-                pickerLightness = clamp(values[2], 0, 100);
-                updateGradient();
-            }
-        });
-
         // Preview click/hold to show base color in Delta mode
         function showBaseColor() {
             if (currentMode === 'delta') {
@@ -879,6 +916,7 @@
         });
 
         // Initial update
+        preview.classList.add('hidden'); // Hide preview in picker mode by default
         updateGradient();
     </script>
 </body>
