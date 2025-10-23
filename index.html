@@ -225,7 +225,7 @@
 
         .color-values {
             display: flex;
-            gap: 0.75rem;
+            gap: 1rem;
             align-items: flex-end;
         }
 
@@ -243,21 +243,18 @@
             border-color: #666;
         }
 
-        .color-fields-wrapper {
+        .hsl-group {
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
-        .hsl-row {
-            display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
             align-items: flex-end;
         }
 
-        .hsl-row .color-value-item {
-            flex: 1;
+        .hsl-group .color-value-item {
+            flex: 0 0 auto;
+        }
+
+        .hsl-group .color-value-item input {
+            width: 52px;
         }
 
         .color-value-item {
@@ -399,25 +396,23 @@
                 <canvas id="colorCanvas" class="color-spectrum-canvas" width="600" height="240"></canvas>
                 <div class="color-values">
                     <div class="color-preview-thumbnail" id="colorPreview"></div>
-                    <div class="color-fields-wrapper">
-                        <div class="hsl-row">
-                            <div class="color-value-item">
-                                <span class="color-value-label">H (0-360°)</span>
-                                <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
-                            </div>
-                            <div class="color-value-item">
-                                <span class="color-value-label">S (0-100%)</span>
-                                <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
-                            </div>
-                            <div class="color-value-item">
-                                <span class="color-value-label">L (0-100%)</span>
-                                <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
-                            </div>
+                    <div class="hsl-group">
+                        <div class="color-value-item">
+                            <span class="color-value-label">H</span>
+                            <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
                         </div>
                         <div class="color-value-item">
-                            <span class="color-value-label">HEX</span>
-                            <input type="text" class="color-value-input" id="hexValue" value="#ff0000">
+                            <span class="color-value-label">S</span>
+                            <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
                         </div>
+                        <div class="color-value-item">
+                            <span class="color-value-label">L</span>
+                            <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                    <div class="color-value-item">
+                        <span class="color-value-label">HEX</span>
+                        <input type="text" class="color-value-input" id="hexValue" value="#ff0000">
                     </div>
                 </div>
             </div>
