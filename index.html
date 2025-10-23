@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Gradient HSL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #fff;
+        }
+
+        .preview {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .control-group {
+            background: #2a2a2a;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #b0b0b0;
+        }
+
+        .hsl-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .input-label {
+            font-size: 0.75rem;
+            color: #808080;
+            text-transform: uppercase;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #3a3a3a;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #e0e0e0;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #e0e0e0;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #666;
+        }
+
+        .value-display {
+            font-size: 0.875rem;
+            color: #fff;
+            font-weight: 500;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        .css-output {
+            background: #2a2a2a;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .css-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.813rem;
+            color: #a0d0ff;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            margin-top: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .copy-btn:hover {
+            background: #4a4a4a;
+            border-color: #666;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Générateur de Gradient HSL</h1>
+
+        <div class="preview" id="preview"></div>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-row">
+                    <label>From</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H <span class="value-display" id="fromH-val">0</span></span>
+                            <input type="range" id="fromH" min="0" max="360" value="0">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S <span class="value-display" id="fromS-val">100</span></span>
+                            <input type="range" id="fromS" min="0" max="100" value="100">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L <span class="value-display" id="fromL-val">50</span></span>
+                            <input type="range" id="fromL" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-row">
+                    <label>To</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H <span class="value-display" id="toH-val">240</span></span>
+                            <input type="range" id="toH" min="0" max="360" value="240">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S <span class="value-display" id="toS-val">100</span></span>
+                            <input type="range" id="toS" min="0" max="100" value="100">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L <span class="value-display" id="toL-val">50</span></span>
+                            <input type="range" id="toL" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Angle</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="range" id="angle" min="0" max="360" value="90" style="flex: 1;">
+                        <span class="value-display" id="angle-val">90°</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="css-output">
+            <div class="css-code" id="cssCode"></div>
+            <button class="copy-btn" id="copyBtn">Copier le CSS</button>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const preview = document.getElementById('preview');
+        const cssCode = document.getElementById('cssCode');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // From color inputs
+        const fromH = document.getElementById('fromH');
+        const fromS = document.getElementById('fromS');
+        const fromL = document.getElementById('fromL');
+        const fromHVal = document.getElementById('fromH-val');
+        const fromSVal = document.getElementById('fromS-val');
+        const fromLVal = document.getElementById('fromL-val');
+
+        // To color inputs
+        const toH = document.getElementById('toH');
+        const toS = document.getElementById('toS');
+        const toL = document.getElementById('toL');
+        const toHVal = document.getElementById('toH-val');
+        const toSVal = document.getElementById('toS-val');
+        const toLVal = document.getElementById('toL-val');
+
+        // Angle input
+        const angle = document.getElementById('angle');
+        const angleVal = document.getElementById('angle-val');
+
+        // Update gradient
+        function updateGradient() {
+            const fromColor = `hsl(${fromH.value}, ${fromS.value}%, ${fromL.value}%)`;
+            const toColor = `hsl(${toH.value}, ${toS.value}%, ${toL.value}%)`;
+            const gradientAngle = angle.value;
+
+            const gradient = `linear-gradient(${gradientAngle}deg, ${fromColor}, ${toColor})`;
+            preview.style.background = gradient;
+            cssCode.textContent = `background: ${gradient};`;
+
+            // Update value displays
+            fromHVal.textContent = fromH.value;
+            fromSVal.textContent = fromS.value;
+            fromLVal.textContent = fromL.value;
+            toHVal.textContent = toH.value;
+            toSVal.textContent = toS.value;
+            toLVal.textContent = toL.value;
+            angleVal.textContent = gradientAngle + '°';
+        }
+
+        // Event listeners
+        fromH.addEventListener('input', updateGradient);
+        fromS.addEventListener('input', updateGradient);
+        fromL.addEventListener('input', updateGradient);
+        toH.addEventListener('input', updateGradient);
+        toS.addEventListener('input', updateGradient);
+        toL.addEventListener('input', updateGradient);
+        angle.addEventListener('input', updateGradient);
+
+        // Copy to clipboard
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(cssCode.textContent).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copié !';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            });
+        });
+
+        // Initial update
+        updateGradient();
+    </script>
+</body>
+</html>
