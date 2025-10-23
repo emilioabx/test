@@ -431,6 +431,35 @@
         deltaL.addEventListener('input', updateGradient);
         angleDelta.addEventListener('input', updateGradient);
 
+        // Preview click/hold to show base color in Delta mode
+        function showBaseColor() {
+            if (currentMode === 'delta') {
+                const baseColor = `hsl(${baseH.value}, ${baseS.value}%, ${baseL.value}%)`;
+                preview.style.background = baseColor;
+            }
+        }
+
+        function showGradient() {
+            if (currentMode === 'delta') {
+                updateGradient();
+            }
+        }
+
+        // Mouse events
+        preview.addEventListener('mousedown', showBaseColor);
+        preview.addEventListener('mouseup', showGradient);
+        preview.addEventListener('mouseleave', showGradient);
+
+        // Touch events for iPad/mobile
+        preview.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            showBaseColor();
+        });
+        preview.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            showGradient();
+        });
+
         // Copy to clipboard
         copyBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(cssCode.textContent).then(() => {
