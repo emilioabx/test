@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Gradient HSL</title>
+    <title>Pro Color Tools</title>
     <style>
         * {
             margin: 0;
@@ -169,71 +169,55 @@
 
         .color-picker-wrapper {
             display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .color-spectrum {
-            flex: 1;
-            min-height: 200px;
-        }
-
-        .color-preview-box {
-            width: 120px;
+        .color-spectrum-canvas {
+            width: 100%;
             height: 200px;
             border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             border: 1px solid #3a3a3a;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .hue-slider-wrapper {
+            margin-top: 1rem;
         }
 
         .color-values {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
             margin-top: 1rem;
         }
 
         .color-value-item {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .color-value-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #808080;
-            min-width: 35px;
+            text-transform: uppercase;
         }
 
-        .color-value-text {
+        .color-value-input {
             font-family: 'Courier New', monospace;
             font-size: 0.813rem;
-            color: #a0d0ff;
+            color: #fff;
             background: #2a2a2a;
-            padding: 0.4rem 0.6rem;
+            padding: 0.5rem 0.6rem;
             border-radius: 4px;
-            flex: 1;
-            user-select: all;
-            cursor: text;
+            border: 1px solid #3a3a3a;
+            outline: none;
         }
 
-        input[type="color"] {
-            width: 100%;
-            height: 50px;
-            border: 1px solid #4a4a4a;
-            border-radius: 6px;
-            background: #2a2a2a;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 4px;
+        .color-value-input:focus {
+            border-color: #666;
         }
 
         .tabs {
@@ -323,7 +307,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>HSL Gradient Generator</h1>
+        <h1>Pro Color Tools</h1>
 
         <div class="tabs">
             <div class="tab active" data-tab="picker">Picker</div>
@@ -336,36 +320,23 @@
         <!-- Color Picker Mode -->
         <div class="tab-content active" id="picker-content">
             <div class="color-picker-wrapper">
-                <div class="color-spectrum">
-                    <input type="color" id="colorPicker" value="#ff0000">
-                    <div class="slider-wrapper" style="margin-top: 1rem;">
-                        <div class="slider-item">
-                            <span class="slider-label">H</span>
-                            <input type="range" id="pickerH" min="0" max="360" value="0">
-                            <span class="slider-value" id="pickerH-val">0</span>
-                        </div>
-                        <div class="slider-item">
-                            <span class="slider-label">S</span>
-                            <input type="range" id="pickerS" min="0" max="100" value="100">
-                            <span class="slider-value" id="pickerS-val">100</span>
-                        </div>
-                        <div class="slider-item">
-                            <span class="slider-label">L</span>
-                            <input type="range" id="pickerL" min="0" max="100" value="50">
-                            <span class="slider-value" id="pickerL-val">50</span>
-                        </div>
+                <canvas id="colorCanvas" class="color-spectrum-canvas" width="600" height="200"></canvas>
+                <div class="hue-slider-wrapper">
+                    <div class="slider-item">
+                        <span class="slider-label">Hue</span>
+                        <input type="range" id="pickerH" min="0" max="360" value="0">
+                        <span class="slider-value" id="pickerH-val">0</span>
                     </div>
                 </div>
-                <div class="color-preview-box" id="pickerPreview"></div>
-            </div>
-            <div class="color-values">
-                <div class="color-value-item">
-                    <span class="color-value-label">HEX</span>
-                    <div class="color-value-text" id="hexValue">#ff0000</div>
-                </div>
-                <div class="color-value-item">
-                    <span class="color-value-label">HSL</span>
-                    <div class="color-value-text" id="hslValue">hsl(0, 100%, 50%)</div>
+                <div class="color-values">
+                    <div class="color-value-item">
+                        <span class="color-value-label">HEX</span>
+                        <input type="text" class="color-value-input" id="hexValue" value="#ff0000">
+                    </div>
+                    <div class="color-value-item">
+                        <span class="color-value-label">HSL</span>
+                        <input type="text" class="color-value-input" id="hslValue" value="0, 100, 50">
+                    </div>
                 </div>
             </div>
         </div>
@@ -509,16 +480,16 @@
         const angleDelta = document.getElementById('angleDelta');
 
         // Color Picker mode inputs
-        const colorPicker = document.getElementById('colorPicker');
+        const colorCanvas = document.getElementById('colorCanvas');
+        const ctx = colorCanvas.getContext('2d');
         const pickerH = document.getElementById('pickerH');
-        const pickerS = document.getElementById('pickerS');
-        const pickerL = document.getElementById('pickerL');
         const pickerHVal = document.getElementById('pickerH-val');
-        const pickerSVal = document.getElementById('pickerS-val');
-        const pickerLVal = document.getElementById('pickerL-val');
-        const pickerPreview = document.getElementById('pickerPreview');
         const hexValue = document.getElementById('hexValue');
         const hslValue = document.getElementById('hslValue');
+
+        // Current picker values
+        let pickerSaturation = 100;
+        let pickerLightness = 50;
 
         // Current mode
         let currentMode = 'picker';
@@ -584,27 +555,44 @@
             };
         }
 
+        // Draw color spectrum on canvas
+        function drawColorSpectrum() {
+            const width = colorCanvas.width;
+            const height = colorCanvas.height;
+            const h = parseInt(pickerH.value);
+
+            // Draw gradient (saturation horizontal, lightness vertical)
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const s = (x / width) * 100;
+                    const l = 100 - (y / height) * 100;
+                    const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
+                    ctx.fillStyle = hslColor;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
         // Update Color Picker display
         function updateColorPicker() {
             const h = parseInt(pickerH.value);
-            const s = parseInt(pickerS.value);
-            const l = parseInt(pickerL.value);
+            const s = pickerSaturation;
+            const l = pickerLightness;
 
             // Update value displays
             pickerHVal.textContent = h;
-            pickerSVal.textContent = s;
-            pickerLVal.textContent = l;
 
             // Update colors
             const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
             const hexColor = hslToHex(h, s, l);
 
-            pickerPreview.style.background = hslColor;
             preview.style.background = hslColor;
-            colorPicker.value = hexColor;
-            hexValue.textContent = hexColor;
-            hslValue.textContent = hslColor;
+            hexValue.value = hexColor;
+            hslValue.value = `${h}, ${s}, ${l}`;
             cssCode.textContent = `background: ${hslColor};`;
+
+            // Redraw spectrum with new hue
+            drawColorSpectrum();
         }
 
         // Update gradient for From/To mode
@@ -708,14 +696,86 @@
 
         // Event listeners for Color Picker mode
         pickerH.addEventListener('input', updateGradient);
-        pickerS.addEventListener('input', updateGradient);
-        pickerL.addEventListener('input', updateGradient);
-        colorPicker.addEventListener('input', (e) => {
-            const hsl = hexToHSL(e.target.value);
-            pickerH.value = hsl.h;
-            pickerS.value = hsl.s;
-            pickerL.value = hsl.l;
+
+        // Canvas click/drag handling
+        let isPickingColor = false;
+
+        function pickColorFromCanvas(e) {
+            const rect = colorCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Convert to canvas coordinates
+            const canvasX = (x / rect.width) * colorCanvas.width;
+            const canvasY = (y / rect.height) * colorCanvas.height;
+
+            // Calculate saturation and lightness
+            pickerSaturation = Math.round((canvasX / colorCanvas.width) * 100);
+            pickerLightness = Math.round(100 - (canvasY / colorCanvas.height) * 100);
+
+            // Clamp values
+            pickerSaturation = clamp(pickerSaturation, 0, 100);
+            pickerLightness = clamp(pickerLightness, 0, 100);
+
             updateGradient();
+        }
+
+        colorCanvas.addEventListener('mousedown', (e) => {
+            isPickingColor = true;
+            pickColorFromCanvas(e);
+        });
+
+        colorCanvas.addEventListener('mousemove', (e) => {
+            if (isPickingColor) {
+                pickColorFromCanvas(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isPickingColor = false;
+        });
+
+        // Touch events for mobile/iPad
+        colorCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isPickingColor = true;
+            const touch = e.touches[0];
+            pickColorFromCanvas(touch);
+        });
+
+        colorCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isPickingColor) {
+                const touch = e.touches[0];
+                pickColorFromCanvas(touch);
+            }
+        });
+
+        colorCanvas.addEventListener('touchend', () => {
+            isPickingColor = false;
+        });
+
+        // HEX input handling
+        hexValue.addEventListener('input', (e) => {
+            const hex = e.target.value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                const hsl = hexToHSL(hex);
+                pickerH.value = hsl.h;
+                pickerSaturation = hsl.s;
+                pickerLightness = hsl.l;
+                updateGradient();
+            }
+        });
+
+        // HSL input handling
+        hslValue.addEventListener('input', (e) => {
+            const values = e.target.value.split(',').map(v => parseInt(v.trim()));
+            if (values.length === 3 && values.every(v => !isNaN(v))) {
+                pickerH.value = clamp(values[0], 0, 360);
+                pickerSaturation = clamp(values[1], 0, 100);
+                pickerLightness = clamp(values[2], 0, 100);
+                updateGradient();
+            }
         });
 
         // Preview click/hold to show base color in Delta mode
