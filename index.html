@@ -103,6 +103,70 @@
             width: 70px;
         }
 
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #3a3a3a;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #e0e0e0;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #e0e0e0;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .slider-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .slider-label {
+            font-size: 0.75rem;
+            color: #808080;
+            min-width: 20px;
+        }
+
+        .slider-value {
+            font-size: 0.75rem;
+            color: #fff;
+            min-width: 35px;
+            text-align: right;
+            font-weight: 500;
+        }
+
         .tabs {
             display: flex;
             gap: 0.5rem;
@@ -253,18 +317,21 @@
             <div class="controls">
                 <div class="control-group">
                     <label>Base</label>
-                    <div class="hsl-inputs">
-                        <div class="input-wrapper">
-                            <span class="input-label">H</span>
-                            <input type="number" id="baseH" min="0" max="360" value="30">
+                    <div class="slider-wrapper">
+                        <div class="slider-item">
+                            <span class="slider-label">H</span>
+                            <input type="range" id="baseH" min="0" max="360" value="30">
+                            <span class="slider-value" id="baseH-val">30</span>
                         </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">S</span>
-                            <input type="number" id="baseS" min="0" max="100" value="50">
+                        <div class="slider-item">
+                            <span class="slider-label">S</span>
+                            <input type="range" id="baseS" min="0" max="100" value="50">
+                            <span class="slider-value" id="baseS-val">50</span>
                         </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">L</span>
-                            <input type="number" id="baseL" min="0" max="100" value="60">
+                        <div class="slider-item">
+                            <span class="slider-label">L</span>
+                            <input type="range" id="baseL" min="0" max="100" value="60">
+                            <span class="slider-value" id="baseL-val">60</span>
                         </div>
                     </div>
                 </div>
@@ -326,6 +393,9 @@
         const baseH = document.getElementById('baseH');
         const baseS = document.getElementById('baseS');
         const baseL = document.getElementById('baseL');
+        const baseHVal = document.getElementById('baseH-val');
+        const baseSVal = document.getElementById('baseS-val');
+        const baseLVal = document.getElementById('baseL-val');
         const deltaH = document.getElementById('deltaH');
         const deltaS = document.getElementById('deltaS');
         const deltaL = document.getElementById('deltaL');
@@ -352,23 +422,28 @@
 
         // Update gradient for Delta mode
         function updateDeltaGradient() {
-            const baseHVal = parseInt(baseH.value);
-            const baseSVal = parseInt(baseS.value);
-            const baseLVal = parseInt(baseL.value);
+            const baseHValue = parseInt(baseH.value);
+            const baseSValue = parseInt(baseS.value);
+            const baseLValue = parseInt(baseL.value);
             const deltaHVal = parseInt(deltaH.value);
             const deltaSVal = parseInt(deltaS.value);
             const deltaLVal = parseInt(deltaL.value);
             const gradientAngle = angleDelta.value;
 
+            // Update value displays
+            baseHVal.textContent = baseHValue;
+            baseSVal.textContent = baseSValue;
+            baseLVal.textContent = baseLValue;
+
             // Calculate color 1: base - delta
-            const color1H = clamp(baseHVal - deltaHVal, 0, 360);
-            const color1S = clamp(baseSVal - deltaSVal, 0, 100);
-            const color1L = clamp(baseLVal - deltaLVal, 0, 100);
+            const color1H = clamp(baseHValue - deltaHVal, 0, 360);
+            const color1S = clamp(baseSValue - deltaSVal, 0, 100);
+            const color1L = clamp(baseLValue - deltaLVal, 0, 100);
 
             // Calculate color 2: base + delta
-            const color2H = clamp(baseHVal + deltaHVal, 0, 360);
-            const color2S = clamp(baseSVal + deltaSVal, 0, 100);
-            const color2L = clamp(baseLVal + deltaLVal, 0, 100);
+            const color2H = clamp(baseHValue + deltaHVal, 0, 360);
+            const color2S = clamp(baseSValue + deltaSVal, 0, 100);
+            const color2L = clamp(baseLValue + deltaLVal, 0, 100);
 
             const color1 = `hsl(${color1H}, ${color1S}%, ${color1L}%)`;
             const color2 = `hsl(${color2H}, ${color2S}%, ${color2L}%)`;
