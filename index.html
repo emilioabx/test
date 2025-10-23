@@ -44,37 +44,30 @@
         }
 
         .controls {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .control-group {
             background: #2a2a2a;
             padding: 1rem;
             border-radius: 6px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
         }
 
-        .control-row {
-            display: grid;
-            grid-template-columns: 80px 1fr;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .control-row:last-child {
-            margin-bottom: 0;
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         label {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            color: #b0b0b0;
+            color: #808080;
+            text-transform: uppercase;
         }
 
         .hsl-inputs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
             gap: 0.5rem;
         }
 
@@ -85,70 +78,38 @@
         }
 
         .input-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #808080;
-            text-transform: uppercase;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #3a3a3a;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: #e0e0e0;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
-        }
-
-        input[type="range"]::-moz-range-thumb:hover {
-            background: #e0e0e0;
+            text-align: center;
         }
 
         input[type="number"] {
-            width: 100%;
-            padding: 0.5rem;
+            width: 60px;
+            padding: 0.4rem 0.3rem;
             background: #3a3a3a;
             border: 1px solid #4a4a4a;
             border-radius: 4px;
             color: #fff;
             font-size: 0.875rem;
             outline: none;
+            text-align: center;
         }
 
         input[type="number"]:focus {
             border-color: #666;
         }
 
-        .value-display {
-            font-size: 0.875rem;
-            color: #fff;
-            font-weight: 500;
-            min-width: 45px;
-            text-align: right;
+        .angle-input {
+            width: 70px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            color: #808080;
+            font-size: 0.75rem;
+            border-top: 1px solid #2a2a2a;
         }
 
         .css-output {
@@ -191,58 +152,52 @@
 </head>
 <body>
     <div class="container">
-        <h1>Générateur de Gradient HSL</h1>
+        <h1>HSL Gradient Generator</h1>
 
         <div class="preview" id="preview"></div>
 
         <div class="controls">
             <div class="control-group">
-                <div class="control-row">
-                    <label>From</label>
-                    <div class="hsl-inputs">
-                        <div class="input-wrapper">
-                            <span class="input-label">H <span class="value-display" id="fromH-val">0</span></span>
-                            <input type="range" id="fromH" min="0" max="360" value="0">
-                        </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">S <span class="value-display" id="fromS-val">100</span></span>
-                            <input type="range" id="fromS" min="0" max="100" value="100">
-                        </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">L <span class="value-display" id="fromL-val">50</span></span>
-                            <input type="range" id="fromL" min="0" max="100" value="50">
-                        </div>
+                <label>From</label>
+                <div class="hsl-inputs">
+                    <div class="input-wrapper">
+                        <span class="input-label">H</span>
+                        <input type="number" id="fromH" min="0" max="360" value="0">
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-label">S</span>
+                        <input type="number" id="fromS" min="0" max="100" value="100">
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-label">L</span>
+                        <input type="number" id="fromL" min="0" max="100" value="50">
                     </div>
                 </div>
             </div>
 
             <div class="control-group">
-                <div class="control-row">
-                    <label>To</label>
-                    <div class="hsl-inputs">
-                        <div class="input-wrapper">
-                            <span class="input-label">H <span class="value-display" id="toH-val">240</span></span>
-                            <input type="range" id="toH" min="0" max="360" value="240">
-                        </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">S <span class="value-display" id="toS-val">100</span></span>
-                            <input type="range" id="toS" min="0" max="100" value="100">
-                        </div>
-                        <div class="input-wrapper">
-                            <span class="input-label">L <span class="value-display" id="toL-val">50</span></span>
-                            <input type="range" id="toL" min="0" max="100" value="50">
-                        </div>
+                <label>To</label>
+                <div class="hsl-inputs">
+                    <div class="input-wrapper">
+                        <span class="input-label">H</span>
+                        <input type="number" id="toH" min="0" max="360" value="240">
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-label">S</span>
+                        <input type="number" id="toS" min="0" max="100" value="100">
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-label">L</span>
+                        <input type="number" id="toL" min="0" max="100" value="50">
                     </div>
                 </div>
             </div>
 
             <div class="control-group">
-                <div class="control-row">
-                    <label>Angle</label>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <input type="range" id="angle" min="0" max="360" value="90" style="flex: 1;">
-                        <span class="value-display" id="angle-val">90°</span>
-                    </div>
+                <label>Angle</label>
+                <div class="input-wrapper">
+                    <span class="input-label">°</span>
+                    <input type="number" id="angle" min="0" max="360" value="90" class="angle-input">
                 </div>
             </div>
         </div>
@@ -251,6 +206,8 @@
             <div class="css-code" id="cssCode"></div>
             <button class="copy-btn" id="copyBtn">Copier le CSS</button>
         </div>
+
+        <footer>© Tiny Platforms Limited 2026</footer>
     </div>
 
     <script>
@@ -263,21 +220,14 @@
         const fromH = document.getElementById('fromH');
         const fromS = document.getElementById('fromS');
         const fromL = document.getElementById('fromL');
-        const fromHVal = document.getElementById('fromH-val');
-        const fromSVal = document.getElementById('fromS-val');
-        const fromLVal = document.getElementById('fromL-val');
 
         // To color inputs
         const toH = document.getElementById('toH');
         const toS = document.getElementById('toS');
         const toL = document.getElementById('toL');
-        const toHVal = document.getElementById('toH-val');
-        const toSVal = document.getElementById('toS-val');
-        const toLVal = document.getElementById('toL-val');
 
         // Angle input
         const angle = document.getElementById('angle');
-        const angleVal = document.getElementById('angle-val');
 
         // Update gradient
         function updateGradient() {
@@ -288,15 +238,6 @@
             const gradient = `linear-gradient(${gradientAngle}deg, ${fromColor}, ${toColor})`;
             preview.style.background = gradient;
             cssCode.textContent = `background: ${gradient};`;
-
-            // Update value displays
-            fromHVal.textContent = fromH.value;
-            fromSVal.textContent = fromS.value;
-            fromLVal.textContent = fromL.value;
-            toHVal.textContent = toH.value;
-            toSVal.textContent = toS.value;
-            toLVal.textContent = toL.value;
-            angleVal.textContent = gradientAngle + '°';
         }
 
         // Event listeners
