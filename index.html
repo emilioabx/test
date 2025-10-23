@@ -175,15 +175,17 @@
 
         .color-spectrum-canvas {
             width: 100%;
-            height: 200px;
+            height: 160px;
             border-radius: 6px;
             border: 1px solid #3a3a3a;
             cursor: crosshair;
             touch-action: none;
+            display: block;
         }
 
         .hue-slider-wrapper {
-            margin-top: 1rem;
+            margin-top: 0;
+            display: none;
         }
 
         .color-values {
@@ -561,16 +563,57 @@
             const height = colorCanvas.height;
             const h = parseInt(pickerH.value);
 
-            // Draw gradient (saturation horizontal, lightness vertical)
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const s = (x / width) * 100;
-                    const l = 100 - (y / height) * 100;
+            // Dimensions
+            const hueBarHeight = Math.floor(height / 10);  // ~1/10 of total height
+            const spectrumHeight = height - hueBarHeight;  // Rest for spectrum
+            const previewWidth = Math.floor(width / 3);    // 1/3 for preview
+            const spectrumWidth = width - previewWidth;     // 2/3 for spectrum
+
+            // 1. Draw preview zone (left 1/3, solid color)
+            const currentColor = `hsl(${h}, ${pickerSaturation}%, ${pickerLightness}%)`;
+            ctx.fillStyle = currentColor;
+            ctx.fillRect(0, 0, previewWidth, spectrumHeight);
+
+            // 2. Draw saturation/lightness spectrum (right 2/3)
+            for (let y = 0; y < spectrumHeight; y++) {
+                for (let x = 0; x < spectrumWidth; x++) {
+                    const s = (x / spectrumWidth) * 100;
+                    const l = 100 - (y / spectrumHeight) * 100;
                     const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
                     ctx.fillStyle = hslColor;
-                    ctx.fillRect(x, y, 1, 1);
+                    ctx.fillRect(previewWidth + x, y, 1, 1);
                 }
             }
+
+            // 3. Draw hue bar at bottom (full width)
+            for (let x = 0; x < width; x++) {
+                const hue = (x / width) * 360;
+                const hueColor = `hsl(${hue}, 100%, 50%)`;
+                ctx.fillStyle = hueColor;
+                ctx.fillRect(x, spectrumHeight, 1, hueBarHeight);
+            }
+
+            // 4. Draw cursor on spectrum zone
+            const cursorX = previewWidth + (pickerSaturation / 100) * spectrumWidth;
+            const cursorY = (1 - pickerLightness / 100) * spectrumHeight;
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cursorX, cursorY, 8, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 5. Draw cursor on hue bar
+            const hueX = (h / 360) * width;
+            const hueY = spectrumHeight + hueBarHeight / 2;
+
+            ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(hueX, hueY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
         }
 
         // Update Color Picker display
@@ -578,9 +621,6 @@
             const h = parseInt(pickerH.value);
             const s = pickerSaturation;
             const l = pickerLightness;
-
-            // Update value displays
-            pickerHVal.textContent = h;
 
             // Update colors
             const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
@@ -709,15 +749,35 @@
             const canvasX = (x / rect.width) * colorCanvas.width;
             const canvasY = (y / rect.height) * colorCanvas.height;
 
-            // Calculate saturation and lightness
-            pickerSaturation = Math.round((canvasX / colorCanvas.width) * 100);
-            pickerLightness = Math.round(100 - (canvasY / colorCanvas.height) * 100);
+            // Dimensions (same as in drawColorSpectrum)
+            const width = colorCanvas.width;
+            const height = colorCanvas.height;
+            const hueBarHeight = Math.floor(height / 10);
+            const spectrumHeight = height - hueBarHeight;
+            const previewWidth = Math.floor(width / 3);
+            const spectrumWidth = width - previewWidth;
 
-            // Clamp values
-            pickerSaturation = clamp(pickerSaturation, 0, 100);
-            pickerLightness = clamp(pickerLightness, 0, 100);
+            // Check if click is in hue bar (bottom)
+            if (canvasY >= spectrumHeight) {
+                // Click in hue bar - update hue
+                const newHue = Math.round((canvasX / width) * 360);
+                pickerH.value = clamp(newHue, 0, 360);
+                updateGradient();
+            }
+            // Check if click is in spectrum zone (right 2/3)
+            else if (canvasX >= previewWidth) {
+                // Click in spectrum - update saturation and lightness
+                const relativeX = canvasX - previewWidth;
+                pickerSaturation = Math.round((relativeX / spectrumWidth) * 100);
+                pickerLightness = Math.round(100 - (canvasY / spectrumHeight) * 100);
 
-            updateGradient();
+                // Clamp values
+                pickerSaturation = clamp(pickerSaturation, 0, 100);
+                pickerLightness = clamp(pickerLightness, 0, 100);
+
+                updateGradient();
+            }
+            // Click in preview zone (left 1/3) - do nothing
         }
 
         colorCanvas.addEventListener('mousedown', (e) => {
