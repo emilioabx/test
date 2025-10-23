@@ -103,6 +103,44 @@
             width: 70px;
         }
 
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #808080;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: #3a3a3a;
+            border-color: #4a4a4a;
+        }
+
+        .tab.active {
+            background: #3a3a3a;
+            border-color: #666;
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         footer {
             text-align: center;
             margin-top: 2rem;
@@ -154,50 +192,107 @@
     <div class="container">
         <h1>HSL Gradient Generator</h1>
 
+        <div class="tabs">
+            <div class="tab active" data-tab="fromto">From / To</div>
+            <div class="tab" data-tab="delta">Delta</div>
+        </div>
+
         <div class="preview" id="preview"></div>
 
-        <div class="controls">
-            <div class="control-group">
-                <label>From</label>
-                <div class="hsl-inputs">
-                    <div class="input-wrapper">
-                        <span class="input-label">H</span>
-                        <input type="number" id="fromH" min="0" max="360" value="0">
+        <!-- From/To Mode -->
+        <div class="tab-content active" id="fromto-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>From</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H</span>
+                            <input type="number" id="fromH" min="0" max="360" value="0">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S</span>
+                            <input type="number" id="fromS" min="0" max="100" value="100">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L</span>
+                            <input type="number" id="fromL" min="0" max="100" value="50">
+                        </div>
                     </div>
-                    <div class="input-wrapper">
-                        <span class="input-label">S</span>
-                        <input type="number" id="fromS" min="0" max="100" value="100">
+                </div>
+
+                <div class="control-group">
+                    <label>To</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H</span>
+                            <input type="number" id="toH" min="0" max="360" value="240">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S</span>
+                            <input type="number" id="toS" min="0" max="100" value="100">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L</span>
+                            <input type="number" id="toL" min="0" max="100" value="50">
+                        </div>
                     </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Angle</label>
                     <div class="input-wrapper">
-                        <span class="input-label">L</span>
-                        <input type="number" id="fromL" min="0" max="100" value="50">
+                        <span class="input-label">°</span>
+                        <input type="number" id="angle" min="0" max="360" value="90" class="angle-input">
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="control-group">
-                <label>To</label>
-                <div class="hsl-inputs">
-                    <div class="input-wrapper">
-                        <span class="input-label">H</span>
-                        <input type="number" id="toH" min="0" max="360" value="240">
-                    </div>
-                    <div class="input-wrapper">
-                        <span class="input-label">S</span>
-                        <input type="number" id="toS" min="0" max="100" value="100">
-                    </div>
-                    <div class="input-wrapper">
-                        <span class="input-label">L</span>
-                        <input type="number" id="toL" min="0" max="100" value="50">
+        <!-- Delta Mode -->
+        <div class="tab-content" id="delta-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Base</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H</span>
+                            <input type="number" id="baseH" min="0" max="360" value="30">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S</span>
+                            <input type="number" id="baseS" min="0" max="100" value="50">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L</span>
+                            <input type="number" id="baseL" min="0" max="100" value="60">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label>Angle</label>
-                <div class="input-wrapper">
-                    <span class="input-label">°</span>
-                    <input type="number" id="angle" min="0" max="360" value="90" class="angle-input">
+                <div class="control-group">
+                    <label>Delta</label>
+                    <div class="hsl-inputs">
+                        <div class="input-wrapper">
+                            <span class="input-label">H Δ</span>
+                            <input type="number" id="deltaH" min="0" max="180" value="5">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">S Δ</span>
+                            <input type="number" id="deltaS" min="0" max="50" value="3">
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-label">L Δ</span>
+                            <input type="number" id="deltaL" min="0" max="50" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Angle</label>
+                    <div class="input-wrapper">
+                        <span class="input-label">°</span>
+                        <input type="number" id="angleDelta" min="0" max="360" value="90" class="angle-input">
+                    </div>
                 </div>
             </div>
         </div>
@@ -215,22 +310,37 @@
         const preview = document.getElementById('preview');
         const cssCode = document.getElementById('cssCode');
         const copyBtn = document.getElementById('copyBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-        // From color inputs
+        // From/To mode inputs
         const fromH = document.getElementById('fromH');
         const fromS = document.getElementById('fromS');
         const fromL = document.getElementById('fromL');
-
-        // To color inputs
         const toH = document.getElementById('toH');
         const toS = document.getElementById('toS');
         const toL = document.getElementById('toL');
-
-        // Angle input
         const angle = document.getElementById('angle');
 
-        // Update gradient
-        function updateGradient() {
+        // Delta mode inputs
+        const baseH = document.getElementById('baseH');
+        const baseS = document.getElementById('baseS');
+        const baseL = document.getElementById('baseL');
+        const deltaH = document.getElementById('deltaH');
+        const deltaS = document.getElementById('deltaS');
+        const deltaL = document.getElementById('deltaL');
+        const angleDelta = document.getElementById('angleDelta');
+
+        // Current mode
+        let currentMode = 'fromto';
+
+        // Helper function to clamp values
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        // Update gradient for From/To mode
+        function updateFromToGradient() {
             const fromColor = `hsl(${fromH.value}, ${fromS.value}%, ${fromL.value}%)`;
             const toColor = `hsl(${toH.value}, ${toS.value}%, ${toL.value}%)`;
             const gradientAngle = angle.value;
@@ -240,7 +350,70 @@
             cssCode.textContent = `background: ${gradient};`;
         }
 
-        // Event listeners
+        // Update gradient for Delta mode
+        function updateDeltaGradient() {
+            const baseHVal = parseInt(baseH.value);
+            const baseSVal = parseInt(baseS.value);
+            const baseLVal = parseInt(baseL.value);
+            const deltaHVal = parseInt(deltaH.value);
+            const deltaSVal = parseInt(deltaS.value);
+            const deltaLVal = parseInt(deltaL.value);
+            const gradientAngle = angleDelta.value;
+
+            // Calculate color 1: base - delta
+            const color1H = clamp(baseHVal - deltaHVal, 0, 360);
+            const color1S = clamp(baseSVal - deltaSVal, 0, 100);
+            const color1L = clamp(baseLVal - deltaLVal, 0, 100);
+
+            // Calculate color 2: base + delta
+            const color2H = clamp(baseHVal + deltaHVal, 0, 360);
+            const color2S = clamp(baseSVal + deltaSVal, 0, 100);
+            const color2L = clamp(baseLVal + deltaLVal, 0, 100);
+
+            const color1 = `hsl(${color1H}, ${color1S}%, ${color1L}%)`;
+            const color2 = `hsl(${color2H}, ${color2S}%, ${color2L}%)`;
+
+            const gradient = `linear-gradient(${gradientAngle}deg, ${color1}, ${color2})`;
+            preview.style.background = gradient;
+            cssCode.textContent = `background: ${gradient};`;
+        }
+
+        // Update gradient based on current mode
+        function updateGradient() {
+            if (currentMode === 'fromto') {
+                updateFromToGradient();
+            } else {
+                updateDeltaGradient();
+            }
+        }
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update active content
+                tabContents.forEach(content => {
+                    if (content.id === `${tabName}-content`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+
+                // Update current mode
+                currentMode = tabName;
+
+                // Update gradient
+                updateGradient();
+            });
+        });
+
+        // Event listeners for From/To mode
         fromH.addEventListener('input', updateGradient);
         fromS.addEventListener('input', updateGradient);
         fromL.addEventListener('input', updateGradient);
@@ -248,6 +421,15 @@
         toS.addEventListener('input', updateGradient);
         toL.addEventListener('input', updateGradient);
         angle.addEventListener('input', updateGradient);
+
+        // Event listeners for Delta mode
+        baseH.addEventListener('input', updateGradient);
+        baseS.addEventListener('input', updateGradient);
+        baseL.addEventListener('input', updateGradient);
+        deltaH.addEventListener('input', updateGradient);
+        deltaS.addEventListener('input', updateGradient);
+        deltaL.addEventListener('input', updateGradient);
+        angleDelta.addEventListener('input', updateGradient);
 
         // Copy to clipboard
         copyBtn.addEventListener('click', () => {
