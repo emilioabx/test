@@ -243,19 +243,6 @@
             border-color: #666;
         }
 
-        .hsl-group {
-            display: flex;
-            gap: 0.25rem;
-            align-items: flex-end;
-        }
-
-        .hsl-group .color-value-item {
-            flex: 0 0 auto;
-        }
-
-        .hsl-group .color-value-item input {
-            width: 52px;
-        }
 
         .hex-field-wrapper {
             display: flex;
@@ -429,20 +416,6 @@
                 <canvas id="colorCanvas" class="color-spectrum-canvas" width="600" height="240"></canvas>
                 <div class="color-values">
                     <div class="color-preview-thumbnail" id="colorPreview"></div>
-                    <div class="hsl-group">
-                        <div class="color-value-item">
-                            <span class="color-value-label">H</span>
-                            <input type="number" class="color-value-input" id="pickerHInput" min="0" max="360" value="0">
-                        </div>
-                        <div class="color-value-item">
-                            <span class="color-value-label">S</span>
-                            <input type="number" class="color-value-input" id="pickerSInput" min="0" max="100" value="100">
-                        </div>
-                        <div class="color-value-item">
-                            <span class="color-value-label">L</span>
-                            <input type="number" class="color-value-input" id="pickerLInput" min="0" max="100" value="50">
-                        </div>
-                    </div>
                     <div class="color-value-item">
                         <span class="color-value-label">HSL</span>
                         <input type="text" class="color-value-input hsl-code-field" id="hslCode" value="0, 100, 50" placeholder="h, s, l">
@@ -602,9 +575,6 @@
         const colorPreview = document.getElementById('colorPreview');
         const hexValue = document.getElementById('hexValue');
         const hslCode = document.getElementById('hslCode');
-        const pickerHInput = document.getElementById('pickerHInput');
-        const pickerSInput = document.getElementById('pickerSInput');
-        const pickerLInput = document.getElementById('pickerLInput');
 
         // Current picker values
         let pickerHue = 0;
@@ -786,9 +756,6 @@
             colorPreview.style.background = hslColor;
             hexValue.value = hexColor.substring(1); // Remove # for display
             hslCode.value = `${h}, ${s}, ${l}`;
-            pickerHInput.value = h;
-            pickerSInput.value = s;
-            pickerLInput.value = l;
             cssCode.textContent = `background: ${hslColor};`;
 
             // Redraw spectrum with new hue
@@ -900,31 +867,6 @@
         deltaS.addEventListener('input', updateGradient);
         deltaL.addEventListener('input', updateGradient);
         angleDelta.addEventListener('input', updateGradient);
-
-        // Event listeners for HSL number inputs
-        pickerHInput.addEventListener('input', (e) => {
-            const value = parseInt(e.target.value);
-            if (!isNaN(value)) {
-                pickerHue = clamp(value, 0, 360);
-                updateGradient();
-            }
-        });
-
-        pickerSInput.addEventListener('input', (e) => {
-            const value = parseInt(e.target.value);
-            if (!isNaN(value)) {
-                pickerSaturation = clamp(value, 0, 100);
-                updateGradient();
-            }
-        });
-
-        pickerLInput.addEventListener('input', (e) => {
-            const value = parseInt(e.target.value);
-            if (!isNaN(value)) {
-                pickerLightness = clamp(value, 0, 100);
-                updateGradient();
-            }
-        });
 
         // Canvas click/drag handling
         let isPickingColor = false;
