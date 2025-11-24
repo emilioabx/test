@@ -406,7 +406,7 @@
 
         .palette-row {
             display: grid;
-            grid-template-columns: auto 80px 80px;
+            grid-template-columns: auto 80px;
             gap: 1rem;
             align-items: center;
             background: #333;
@@ -441,18 +441,162 @@
             border-color: #666;
         }
 
-        .palette-preview-white {
-            background-color: #ffffff;
+        /* Theme Toggle */
+        .theme-toggle-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
         }
 
-        .palette-preview-black {
-            background-color: #000000;
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #333;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: #3a3a3a;
+        }
+
+        .theme-toggle-label {
+            font-size: 0.875rem;
+            color: #9a9a9a;
+        }
+
+        .theme-toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #4a4a4a;
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle-switch-dot {
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: left 0.3s;
+        }
+
+        .theme-toggle.active .theme-toggle-switch {
+            background: #666;
+        }
+
+        .theme-toggle.active .theme-toggle-switch-dot {
+            left: 23px;
+        }
+
+        /* Light Theme */
+        body.light-theme {
+            background: #e8e8e8;
+            color: #1a1a1a;
+        }
+
+        body.light-theme h1 {
+            color: #000;
+        }
+
+        body.light-theme .tab {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+            color: #666;
+        }
+
+        body.light-theme .tab:hover {
+            background: #fff;
+            border-color: #b0b0b0;
+        }
+
+        body.light-theme .tab.active {
+            background: #fff;
+            border-color: #999;
+            color: #000;
+        }
+
+        body.light-theme .color-picker-wrapper,
+        body.light-theme .controls,
+        body.light-theme .css-output,
+        body.light-theme .theme-toggle,
+        body.light-theme .palette-row {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+        }
+
+        body.light-theme .color-spectrum-canvas {
+            border-color: #c0c0c0;
+        }
+
+        body.light-theme input[type="number"],
+        body.light-theme input[type="text"],
+        body.light-theme .color-value-input {
+            background: #fff;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        body.light-theme .hex-prefix {
+            background: #fff;
+            border-color: #d0d0d0;
+            color: #666;
+        }
+
+        body.light-theme .color-value-label {
+            color: #666;
+        }
+
+        body.light-theme .color-preview-thumbnail,
+        body.light-theme .palette-preview {
+            border-color: #c0c0c0;
+        }
+
+        body.light-theme .css-code {
+            color: #0066cc;
+        }
+
+        body.light-theme .copy-btn {
+            background: #fff;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        body.light-theme .copy-btn:hover {
+            background: #f0f0f0;
+            border-color: #b0b0b0;
+        }
+
+        body.light-theme .theme-toggle-label {
+            color: #666;
+        }
+
+        body.light-theme footer {
+            color: #666;
+            border-top-color: #d0d0d0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Pro Color Tools</h1>
+
+        <div class="theme-toggle-wrapper">
+            <div class="theme-toggle" id="themeToggle">
+                <span class="theme-toggle-label">Light Mode</span>
+                <div class="theme-toggle-switch">
+                    <div class="theme-toggle-switch-dot"></div>
+                </div>
+            </div>
+        </div>
 
         <div class="tabs">
             <div class="tab active" data-tab="picker">Picker</div>
@@ -1095,8 +1239,7 @@
                             <input type="number" class="color-value-input" data-row="${i}" data-field="l" min="0" max="100" value="${paletteColors[i].l}">
                         </div>
                     </div>
-                    <div class="palette-preview palette-preview-white" data-row="${i}" data-bg="white"></div>
-                    <div class="palette-preview palette-preview-black" data-row="${i}" data-bg="black"></div>
+                    <div class="palette-preview" data-row="${i}"></div>
                 `;
                 paletteGrid.appendChild(row);
             }
@@ -1153,6 +1296,27 @@
                 updatePaletteRow(i);
             }
         }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeLabel = themeToggle.querySelector('.theme-toggle-label');
+
+        // Check for saved theme preference or default to 'dark'
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-theme');
+            themeToggle.classList.add('active');
+            themeLabel.textContent = 'Dark Mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            themeToggle.classList.toggle('active');
+
+            const isLight = document.body.classList.contains('light-theme');
+            themeLabel.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
 
         // Initial update
         preview.classList.add('hidden'); // Hide preview in picker mode by default
