@@ -399,6 +399,12 @@
 
         /* Palette styles */
         .palette-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .palette-column {
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
@@ -783,8 +789,8 @@
         // Current mode
         let currentMode = 'picker';
 
-        // Palette data (10 colors, default white)
-        let paletteColors = Array(10).fill(null).map(() => ({ h: 0, s: 0, l: 100 }));
+        // Palette data (16 colors, default white)
+        let paletteColors = Array(16).fill(null).map(() => ({ h: 0, s: 0, l: 100 }));
 
         // Helper function to clamp values
         function clamp(value, min, max) {
@@ -1218,7 +1224,14 @@
             const paletteGrid = document.getElementById('paletteGrid');
             paletteGrid.innerHTML = '';
 
-            for (let i = 0; i < 10; i++) {
+            // Create two columns
+            const leftColumn = document.createElement('div');
+            leftColumn.className = 'palette-column';
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'palette-column';
+
+            // Create 16 rows (8 per column)
+            for (let i = 0; i < 16; i++) {
                 const row = document.createElement('div');
                 row.className = 'palette-row';
                 row.innerHTML = `
@@ -1238,8 +1251,17 @@
                     </div>
                     <div class="palette-preview" data-row="${i}"></div>
                 `;
-                paletteGrid.appendChild(row);
+
+                // Add to left column (0-7) or right column (8-15)
+                if (i < 8) {
+                    leftColumn.appendChild(row);
+                } else {
+                    rightColumn.appendChild(row);
+                }
             }
+
+            paletteGrid.appendChild(leftColumn);
+            paletteGrid.appendChild(rightColumn);
 
             // Add event listeners to all palette inputs
             paletteGrid.querySelectorAll('input[type="number"]').forEach(input => {
