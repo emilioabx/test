@@ -396,6 +396,58 @@
         .copy-btn:active {
             transform: scale(0.98);
         }
+
+        /* Palette styles */
+        .palette-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .palette-row {
+            display: grid;
+            grid-template-columns: auto 80px 80px;
+            gap: 1rem;
+            align-items: center;
+            background: #333;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+        }
+
+        .palette-hsl-inputs {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .palette-hsl-inputs .color-value-item {
+            flex: 0 0 auto;
+        }
+
+        .palette-hsl-inputs input {
+            width: 52px;
+        }
+
+        .palette-preview {
+            width: 80px;
+            height: 60px;
+            border-radius: 6px;
+            border: 2px solid #4a4a4a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s;
+        }
+
+        .palette-preview:hover {
+            border-color: #666;
+        }
+
+        .palette-preview-white {
+            background-color: #ffffff;
+        }
+
+        .palette-preview-black {
+            background-color: #000000;
+        }
     </style>
 </head>
 <body>
@@ -404,6 +456,7 @@
 
         <div class="tabs">
             <div class="tab active" data-tab="picker">Picker</div>
+            <div class="tab" data-tab="palette">Palette</div>
             <div class="tab" data-tab="fromto">From / To</div>
             <div class="tab" data-tab="delta">Delta</div>
         </div>
@@ -429,6 +482,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Palette Mode -->
+        <div class="tab-content" id="palette-content">
+            <div class="palette-grid" id="paletteGrid"></div>
         </div>
 
         <!-- From/To Mode -->
@@ -583,6 +641,9 @@
 
         // Current mode
         let currentMode = 'picker';
+
+        // Palette data (10 colors, default white)
+        let paletteColors = Array(10).fill(null).map(() => ({ h: 0, s: 0, l: 100 }));
 
         // Helper function to clamp values
         function clamp(value, min, max) {
@@ -839,7 +900,7 @@
                 currentMode = tabName;
 
                 // Show/hide preview based on mode
-                if (tabName === 'picker') {
+                if (tabName === 'picker' || tabName === 'palette') {
                     preview.classList.add('hidden');
                 } else {
                     preview.classList.remove('hidden');
@@ -1011,8 +1072,91 @@
             });
         });
 
+        // Initialize Palette
+        function initPalette() {
+            const paletteGrid = document.getElementById('paletteGrid');
+            paletteGrid.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const row = document.createElement('div');
+                row.className = 'palette-row';
+                row.innerHTML = `
+                    <div class="palette-hsl-inputs">
+                        <div class="color-value-item">
+                            <span class="color-value-label">H</span>
+                            <input type="number" class="color-value-input" data-row="${i}" data-field="h" min="0" max="360" value="${paletteColors[i].h}">
+                        </div>
+                        <div class="color-value-item">
+                            <span class="color-value-label">S</span>
+                            <input type="number" class="color-value-input" data-row="${i}" data-field="s" min="0" max="100" value="${paletteColors[i].s}">
+                        </div>
+                        <div class="color-value-item">
+                            <span class="color-value-label">L</span>
+                            <input type="number" class="color-value-input" data-row="${i}" data-field="l" min="0" max="100" value="${paletteColors[i].l}">
+                        </div>
+                    </div>
+                    <div class="palette-preview palette-preview-white" data-row="${i}" data-bg="white"></div>
+                    <div class="palette-preview palette-preview-black" data-row="${i}" data-bg="black"></div>
+                `;
+                paletteGrid.appendChild(row);
+            }
+
+            // Add event listeners to all palette inputs
+            paletteGrid.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', handlePaletteInput);
+            });
+
+            // Update all previews
+            updateAllPalettePreviews();
+        }
+
+        // Handle palette input changes
+        function handlePaletteInput(e) {
+            const row = parseInt(e.target.dataset.row);
+            const field = e.target.dataset.field;
+            const value = parseInt(e.target.value);
+
+            if (!isNaN(value)) {
+                if (field === 'h') {
+                    paletteColors[row].h = clamp(value, 0, 360);
+                } else if (field === 's') {
+                    paletteColors[row].s = clamp(value, 0, 100);
+                } else if (field === 'l') {
+                    paletteColors[row].l = clamp(value, 0, 100);
+                }
+                updatePaletteRow(row);
+            }
+        }
+
+        // Update palette row previews
+        function updatePaletteRow(row) {
+            const color = paletteColors[row];
+            const hslColor = `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
+
+            const previews = document.querySelectorAll(`[data-row="${row}"]`);
+            previews.forEach(preview => {
+                if (preview.classList.contains('palette-preview')) {
+                    const colorDiv = document.createElement('div');
+                    colorDiv.style.width = '100%';
+                    colorDiv.style.height = '100%';
+                    colorDiv.style.backgroundColor = hslColor;
+                    colorDiv.style.borderRadius = '4px';
+                    preview.innerHTML = '';
+                    preview.appendChild(colorDiv);
+                }
+            });
+        }
+
+        // Update all palette previews
+        function updateAllPalettePreviews() {
+            for (let i = 0; i < paletteColors.length; i++) {
+                updatePaletteRow(i);
+            }
+        }
+
         // Initial update
         preview.classList.add('hidden'); // Hide preview in picker mode by default
+        initPalette(); // Initialize palette
         updateGradient();
     </script>
 </body>
